@@ -61,7 +61,7 @@ def main():
   cupboard_index_start = all_text.find("Cupboard")
   freezer_index_start = all_text.find("Freezer")
   age_restrict_index_start = all_text.find("Age-restricted products")
-  offer_savings_index_start = all_text.find("Offer savings")
+  offer_savings_index_start = all_text.find("Offers savings")
 
   # If not found index = -1
   fridge_index_end = None
@@ -143,12 +143,26 @@ def main():
     elif key == "No use-by date":
       date = (delivery_date + timedelta(days=30)).strftime("%d/%m/%Y")
     elif key in days_of_week:
-        date = (next_weekday(delivery_date, days_of_week.index(key))).strftime("%Y/%m/%d")
+        date = (next_weekday(delivery_date, days_of_week.index(key))).strftime("%d/%m/%Y")
     
     if date is not None:
       final_items_date_dict[date] = all_items_dict[key]
   
   print(final_items_date_dict)
+
+  # Convert to CSV format
+  headers = ["Subject", "Start Date", "Description"]
+  event_rows = []
+  for dateString, itemList in final_items_date_dict.items():
+    items_string = (' - ').join(itemList)
+    event_rows.append(["Expiring Today", dateString, f" - {items_string}"])
+
+  # Write to CSV file
+  with open("expiry_dates.csv", "w") as f:
+    f.write(",".join(headers) + "\n")
+    for row in event_rows:
+      f.write(",".join(row) + "\n")
+  
   return final_items_date_dict
 
 if __name__ == "__main__":
