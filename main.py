@@ -158,7 +158,7 @@ def main():
     event_rows.append(["Expiring Today", dateString, f" - {items_string}"])
 
   # Write to CSV file
-  with open("expiry_dates.csv", "w") as f:
+  with open("expiry_dates.txt", "w") as f:
     f.write(",".join(headers) + "\n")
     for row in event_rows:
       f.write(",".join(row) + "\n")
