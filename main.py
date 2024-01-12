@@ -61,6 +61,7 @@ def main():
   cupboard_index_start = all_text.find("Cupboard")
   freezer_index_start = all_text.find("Freezer")
   age_restrict_index_start = all_text.find("Age-restricted products")
+  substituted_items_start = all_text.find("Substituted items - Alternatives for unavailable items")
   offer_savings_index_start = all_text.find("Offers savings")
 
   # If not found index = -1
@@ -73,6 +74,8 @@ def main():
     fridge_index_end = freezer_index_start
   elif age_restrict_index_start != -1:
     fridge_index_end = age_restrict_index_start
+  elif substituted_items_start != -1:
+    fridge_index_end = substituted_items_start
   elif offer_savings_index_start != -1:
     fridge_index_end = offer_savings_index_start
 
@@ -83,6 +86,8 @@ def main():
     cupboard_index_end = freezer_index_start
   elif age_restrict_index_start != -1:
     cupboard_index_end = age_restrict_index_start
+  elif substituted_items_start != -1:
+    fridge_index_end = substituted_items_start
   elif offer_savings_index_start != -1:
     cupboard_index_end = offer_savings_index_start
 
@@ -92,6 +97,8 @@ def main():
     print("Freezer section not found")
   elif age_restrict_index_start != -1:
     freezer_index_end = age_restrict_index_start
+  elif substituted_items_start != -1:
+    fridge_index_end = substituted_items_start
   elif offer_savings_index_start != -1:
     freezer_index_end = offer_savings_index_start
 
