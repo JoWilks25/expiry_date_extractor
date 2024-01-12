@@ -140,8 +140,9 @@ def main():
     date = None
     if key == "Over one week":
       date = (delivery_date + timedelta(days=7)).strftime("%d/%m/%Y")
-    elif key == "No use-by date":
-      date = (delivery_date + timedelta(days=30)).strftime("%d/%m/%Y")
+    # Exclude items with no use-by date
+    # elif key == "No use-by date":
+    #   date = (delivery_date + timedelta(days=30)).strftime("%d/%m/%Y")
     elif key in days_of_week:
         date = (next_weekday(delivery_date, days_of_week.index(key))).strftime("%d/%m/%Y")
     
@@ -150,16 +151,27 @@ def main():
   
   print(final_items_date_dict)
 
-  # Convert to CSV format
-  headers = ["Subject", "Start Date", "Description"]
+  # Convert to Text format ExpiryDate,itemName,units
   event_rows = []
   for dateString, itemList in final_items_date_dict.items():
-    items_string = (' - ').join(itemList)
-    event_rows.append(["Expiring Today", dateString, f" - {items_string}"])
+    for item in itemList:
+      split_name = item.split('/')
+      print("split_name", split_name)
+      itemName = ''
+      units = ''
+      # for item with multiple units i.e. 
+      # 'ARLA LACTOFREE SEMI SKIMMED MILK DRINK 2l (£3.00/EACH)2/26.00' = ['ARLA LACTOFREE SEMI SKIMMED MILK DRINK 2l (£3.00', 'EACH)2', '26.00']
+      if len(split_name) > 2:
+        itemName = split_name[0]
+        units = split_name[1][-1]
+      else:
+        # "JACKSON'S SUPER SEEDED BROWN BLOOMER 800g1/12.00" = ["JACKSON'S SUPER SEEDED BROWN BLOOMER 800g1", '12.00']
+        itemName = split_name[0][0:-1]
+        units = split_name[0][-1]
+      event_rows.append([dateString, f"{itemName}", f"{units}"]) #TODO - strip out units
 
   # Write to CSV file
   with open("expiry_dates.txt", "w") as f:
-    f.write(",".join(headers) + "\n")
     for row in event_rows:
       f.write(",".join(row) + "\n")
   
