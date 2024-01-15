@@ -4,6 +4,7 @@ from PyPDF2 import PdfReader
 path_to_pdf = "receipt.pdf"
 days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+#TODO Refactor this to deal with all delivered/ordered? or create separate function?
 def generate_item_date_dict(section_text):
   # Remove the "Section Title" from the list
   split_section_text = section_text.strip().split("\n")[1:]
