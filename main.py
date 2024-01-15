@@ -4,10 +4,11 @@ from PyPDF2 import PdfReader
 path_to_pdf = "receipt.pdf"
 days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-#TODO Refactor this to deal with all delivered/ordered? or create separate function?
 def generate_item_date_dict(section_text):
   # Remove the "Section Title" from the list
+  print("section_text", section_text)
   split_section_text = section_text.strip().split("\n")[1:]
+  print("split_section_text", split_section_text)
   expiry_items = {}
   current_day = None
   merge_with_next_line = False
@@ -129,6 +130,7 @@ def main():
   cupboard_dict = generate_item_date_dict(cupboard_text)
   freezer_dict = generate_item_date_dict(freezer_text)
   substituted_dict = generate_item_date_dict(substituted_text)
+  print("substituted_dict", substituted_dict)
 
   # Merge all Dicts
   all_items_dict = {}
@@ -156,7 +158,7 @@ def main():
     else:
       all_items_dict[key] = substituted_dict[key]
 
-  print(all_items_dict)
+  # print(all_items_dict)
 
   # Determine delivery date
   delivery_date_start = all_text.find("Delivery date:") + 14
@@ -187,19 +189,21 @@ def main():
   for dateString, itemList in final_items_date_dict.items():
     for item in itemList:
       split_name = item.split('/')
-      print("split_name", split_name)
       itemName = ''
       units = ''
       # for item with multiple units i.e. 
       # 'ARLA LACTOFREE SEMI SKIMMED MILK DRINK 2l (£3.00/EACH)2/26.00' = ['ARLA LACTOFREE SEMI SKIMMED MILK DRINK 2l (£3.00', 'EACH)2', '26.00']
       if len(split_name) > 2:
         itemName = split_name[0]
-        units = split_name[1][-1]
+        units = split_name[len(split_name) - 2][-1] # Always get the number before the last /
       else:
         # "JACKSON'S SUPER SEEDED BROWN BLOOMER 800g1/12.00" = ["JACKSON'S SUPER SEEDED BROWN BLOOMER 800g1", '12.00']
         itemName = split_name[0][0:-1]
         units = split_name[0][-1]
-      event_rows.append([dateString, f"{itemName}", f"{units}"]) #TODO - strip out units
+      # if number of units is 0 (i.e. because of a substitution) don't add
+      if int(units) > 0:
+        event_rows.append([dateString, f"{itemName}", f"{units}"])
+        
 
   # Write to CSV file
   with open("expiry_dates.txt", "w") as f:
