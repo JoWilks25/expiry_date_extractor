@@ -56,14 +56,16 @@ def main():
   # 2. Cupboard
   # 3. Freezer
   # 4. Age-restricted products (assume no expiry date)
-  # 5. Offer savings (Assume should always exist)
+  # 5. Substituted items
+  # 6. Offer savings (Assume should always exist)
   fridge_index_start= all_text.find("Fridge")
   cupboard_index_start = all_text.find("Cupboard")
   freezer_index_start = all_text.find("Freezer")
   age_restrict_index_start = all_text.find("Age-restricted products")
-  substituted_items_start = all_text.find("Substituted items - Alternatives for unavailable items")
-  offer_savings_index_start = all_text.find("Offers savings")
+  substituted_items_start = all_text.find("Substituted items")
+  offer_savings_index_start = all_text.find("Offers savings", fridge_index_start) # Start at Fridge text so don't get offer savings from grey box
 
+  # TODO - Replace the bazillion if else statements
   # If not found index = -1
   fridge_index_end = None
   if fridge_index_start == -1:
@@ -91,26 +93,41 @@ def main():
   elif offer_savings_index_start != -1:
     cupboard_index_end = offer_savings_index_start
 
-
   freezer_index_end = None
   if freezer_index_start == -1:
     print("Freezer section not found")
   elif age_restrict_index_start != -1:
     freezer_index_end = age_restrict_index_start
   elif substituted_items_start != -1:
-    fridge_index_end = substituted_items_start
+    freezer_index_end = substituted_items_start
   elif offer_savings_index_start != -1:
     freezer_index_end = offer_savings_index_start
+
+  age_restrict_index_end = None
+  if age_restrict_index_start == -1:
+    print("Age Restricted section not found")
+  elif substituted_items_start != -1:
+    age_restrict_index_end = substituted_items_start
+  elif offer_savings_index_start != -1:
+    age_restrict_index_end = offer_savings_index_start
+
+  substituted_items_end = None
+  if substituted_items_start == -1:
+    print("Substituted items section not found")
+  elif offer_savings_index_start != -1:
+    substituted_items_end = offer_savings_index_start
 
   # Extract text from each section
   fridge_text = all_text[fridge_index_start:fridge_index_end]
   cupboard_text = all_text[cupboard_index_start:cupboard_index_end]
   freezer_text = all_text[freezer_index_start:freezer_index_end]
+  substituted_text = all_text[substituted_items_start:substituted_items_end]
 
   # Get each specific item under each section
   fridge_dict = generate_item_date_dict(fridge_text)
   cupboard_dict = generate_item_date_dict(cupboard_text)
   freezer_dict = generate_item_date_dict(freezer_text)
+  substituted_dict = generate_item_date_dict(substituted_text)
 
   # Merge all Dicts
   all_items_dict = {}
@@ -131,6 +148,12 @@ def main():
       all_items_dict[key].extend(freezer_dict[key])
     else:
       all_items_dict[key] = freezer_dict[key]
+  
+  for key in substituted_dict.keys():
+    if key in all_items_dict:
+      all_items_dict[key].extend(substituted_dict[key])
+    else:
+      all_items_dict[key] = substituted_dict[key]
 
   print(all_items_dict)
 
