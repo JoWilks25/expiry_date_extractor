@@ -172,6 +172,7 @@ def main():
   for key in all_items_dict.keys():
     date = None
     if key == "Over one week":
+      # TODO - force checking expiry date when use in notification app
       date = (delivery_date + timedelta(days=7)).strftime("%d/%m/%Y")
     # Exclude items with no use-by date
     # elif key == "No use-by date":
